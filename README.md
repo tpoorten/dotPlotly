@@ -23,7 +23,7 @@ Use `./mummerCoordsDotPlotly.R -h` to see options.
 		filter alignments less than cutoff X bp [default 10000]
 
 	-k NUMBER-REF-CHROMOSOMES, --number-ref-chromosomes=NUMBER-REF-CHROMOSOMES
-		number of sort reference chromosomes to keep [default all chromosmes]
+		number of sorted reference chromosomes to keep [default all chromosmes]
 
 	-s, --similarity
 		turn on color alignments by percent similarity [default FALSE]

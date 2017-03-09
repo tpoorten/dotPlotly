@@ -15,7 +15,7 @@ option_list <- list(
               help="filter alignments less than cutoff X bp [default %default]",
               dest="min_align"),
   make_option(c("-k", "--number-ref-chromosomes"), type="numeric", default=NULL,
-              help="number of sort reference chromosomes to keep [default all chromosmes]",
+              help="number of sorted reference chromosomes to keep [default all chromosmes]",
               dest="keep_ref"),
   make_option(c("-s", "--similarity"), action="store_true", default=FALSE,
               help="turn on color alignments by percent similarity [default %default]",
