@@ -9,7 +9,7 @@ show-coords -c example.delta > example.coords
 ./mummerCoordsDotPlotly.R -i example.coords -k 4 -m 10000 -o out
 ```
 
-The script requires three R packages: `install.packages(c("optparse", "ggplot2", "plotly"))` 
+The script requires three R packages: `install.packages(c("optparse", "ggplot2", "plotly"))`. 
 Use `./mummerCoordsDotPlotly.R -h` to see options.
 
 ```
