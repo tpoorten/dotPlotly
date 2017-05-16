@@ -1,0 +1,1 @@
+../mummerCoordsDotPlotly.R -i Brapa_Bnapus.nucmer.coords -o Brapa_Bnapus.nucmer -p 8 -q 100000 -m 500 -l -s -k 10
