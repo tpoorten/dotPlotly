@@ -141,11 +141,11 @@ if (opt$similarity) {
   gp = ggplot(alignments) +
     geom_point(
       mapping = aes(x = refStart2, y = queryStart2, color = percentIDmean),
-      size = 0.009
+      size = 0.05
     ) +
     geom_point(
       mapping = aes(x = refEnd2, y = queryEnd2, color = percentIDmean),
-      size = 0.009
+      size = 0.05
     ) +
     geom_segment(
       aes(
@@ -188,9 +188,9 @@ if (opt$similarity) {
 } else {
   gp = ggplot(alignments) +
     geom_point(mapping = aes(x = refStart2, y = queryStart2),
-               size = 0.009) +
+               size = 0.05) +
     geom_point(mapping = aes(x = refEnd2, y = queryEnd2),
-               size = 0.009) +
+               size = 0.05) +
     geom_segment(aes(
       x = refStart2,
       xend = refEnd2,

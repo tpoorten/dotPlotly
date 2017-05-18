@@ -1,1 +1,0 @@
-../mummerCoordsDotPlotly.R -i Brapa_Bnapus.nucmer.delta.filter.coords -o Brapa_Bnapus -p 8 -q 20000 -m 0 -l -s -k 10
