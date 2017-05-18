@@ -177,7 +177,12 @@ if (opt$similarity) {
                color = "grey60",
                size = .1) }} +
     scale_color_distiller(palette = "Spectral") +
-    labs(color = "Mean Percent Identity (per query)") +
+    labs(color = "Mean Percent Identity (per query)", 
+         title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"\t\t\t\t"),
+                           paste0("minimum alignment length (-m): ", opt$min_align,"\n"),
+                           paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"\t\t\t\t\t\t\t\t"),
+                           paste0("minimum query aggregate alignment length (-q): ", opt$min_query_aln)
+         )) +
     xlab("Reference") +
     ylab("Query")
 } else {
@@ -212,7 +217,12 @@ if (opt$similarity) {
     { if(opt$h_lines){ geom_hline(yintercept = yTickMarks,
                                   color = "grey60",
                                   size = .1) }} +
-    labs(color = "Mean Percent Identity (per query)") +
+    labs(color = "Mean Percent Identity (per query)", 
+         title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"\t\t\t\t"),
+                           paste0("minimum alignment length (-m): ", opt$min_align,"\n"),
+                           paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"\t\t\t\t\t\t\t\t"),
+                           paste0("minimum query aggregate alignment length (-q): ", opt$min_query_aln)
+         )) +
     xlab("Reference") +
     ylab("Query")
 }
