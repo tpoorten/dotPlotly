@@ -94,9 +94,15 @@ scaffoldIDmean = tapply(alignments$percentID, alignments$queryID, mean)
 alignments$percentIDmean = scaffoldIDmean[match(alignments$queryID, names(scaffoldIDmean))]
 
 # make new ref alignments for dot plot
-chromMax = tapply(alignments$refEnd, alignments$refID, max)
-alignments$refStart2 = alignments$refStart + sapply(as.character(alignments$refID), function(x) ifelse(x == names(sort(chromMax, decreasing = T))[1], 0, cumsum(chromMax)[match(x, names(sort(chromMax, decreasing = T))) - 1]) )
-alignments$refEnd2 = alignments$refEnd +     sapply(as.character(alignments$refID), function(x) ifelse(x == names(sort(chromMax, decreasing = T))[1], 0, cumsum(chromMax)[match(x, names(sort(chromMax, decreasing = T))) - 1]) )
+if(length(levels(alignments$refID)) > 1){
+	chromMax = tapply(alignments$refEnd, alignments$refID, max)
+	alignments$refStart2 = alignments$refStart + sapply(as.character(alignments$refID), function(x) ifelse(x == names(sort(chromMax, decreasing = T))[1], 0, cumsum(chromMax)[match(x, names(sort(chromMax, decreasing = T))) - 1]) )
+	alignments$refEnd2 = alignments$refEnd +     sapply(as.character(alignments$refID), function(x) ifelse(x == names(sort(chromMax, decreasing = T))[1], 0, cumsum(chromMax)[match(x, names(sort(chromMax, decreasing = T))) - 1]) )
+} else {
+	alignments$refStart2 = alignments$refStart
+	alignments$refEnd2 = alignments$refEnd
+
+}
 
 ## queryID sorting step 1/2
 # sort levels of factor 'queryID' based on longest alignment
@@ -116,7 +122,9 @@ alignments$queryID = factor(alignments$queryID, levels = unique(as.character(ali
 ## sort levels of factor 'queryID' based on longest aggregrate alignmentst to refID's
 # per query ID, get aggregrate alignment length to each refID 
 queryLenAggPerRef = sapply((levels(alignments$queryID)), function(x) tapply(alignments$lenAlnQuery[which(alignments$queryID == x)], alignments$refID[which(alignments$queryID == x)], sum) )
-queryID_Ref = apply(queryLenAggPerRef, 2, function(x) rownames(queryLenAggPerRef)[which.max(x)])
+if(length(levels(alignments$refID)) > 1){
+	queryID_Ref = apply(queryLenAggPerRef, 2, function(x) rownames(queryLenAggPerRef)[which.max(x)])
+	} else {queryID_Ref = sapply(queryLenAggPerRef, function(x) rownames(queryLenAggPerRef)[which.max(x)])}
 # set order for queryID
 alignments$queryID = factor(alignments$queryID, levels = (levels(alignments$queryID))[order(match(queryID_Ref, levels(alignments$refID)))])
 
