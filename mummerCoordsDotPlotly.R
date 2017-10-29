@@ -4,6 +4,7 @@
 suppressPackageStartupMessages(library(optparse))
 suppressPackageStartupMessages(library(ggplot2))
 suppressPackageStartupMessages(library(plotly))
+
 option_list <- list(
   make_option(c("-i","--input"), type="character", default=NULL,
               help="coords file from mummer program 'show.coords' [default %default]",
@@ -28,9 +29,12 @@ option_list <- list(
   make_option(c("-k", "--number-ref-chromosomes"), type="numeric", default=NULL,
               help="number of sorted reference chromosomes to keep [default all chromosmes]",
               dest="keep_ref"),
-  make_option(c("-s", "--similarity"), action="store_true", default=FALSE,
-              help="turn on color alignments by percent similarity [default %default]",
+  make_option(c("-s", "--identity"), action="store_true", default=FALSE,
+              help="turn on color alignments by % identity [default %default]",
               dest="similarity"),
+  make_option(c("-t", "--identity-on-target"), action="store_true", default=FALSE,
+              help="turn on calculation of % identity for on-target alignments only [default %default]",
+              dest="on_target"),
   make_option(c("-x", "--interactive-plot-off"), action="store_false", default=TRUE,
               help="turn off production of interactive plotly [default %default]",
               dest="interactive")
@@ -49,9 +53,12 @@ if(opt$v){
   cat(paste0("plot size (-p): ", opt$plot_size,"\n"))
   cat(paste0("show horizontal lines (-l): ", opt$h_lines,"\n"))
   cat(paste0("number of reference chromosomes to keep (-k): ", opt$keep_ref,"\n"))
-  cat(paste0("show similarity (-s): ", opt$similarity,"\n"))
-  cat(paste0("produce interactive plot (-x): ", opt$interactive,"\n\n"))
+  cat(paste0("show % identity (-s): ", opt$similarity,"\n"))
+  cat(paste0("show % identity for on-target alignments only (-t): ", opt$similarity,"\n"))
+  cat(paste0("produce interactive plot (-x): ", opt$interactive,"\n"))
 }
+opt$output_filename = unlist(strsplit(opt$output_filename, "/"))[length(unlist(strsplit(opt$output_filename, "/")))]
+
 # read in alignments
 alignments = read.table(opt$input_filename, stringsAsFactors = F, skip = 5)
 alignments = alignments[,-c(3,6,9,11,14)]
@@ -73,14 +80,12 @@ alignments = alignments[which(alignments$lenAlnQuery > opt$min_align),]
 queryLenAgg = tapply(alignments$lenAlnQuery, alignments$queryID, sum)
 alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
 
-# sort by ref chromosome sizes, keep top X chromosomes
+# # sort by ref chromosome sizes, keep top X chromosomes
 chromMax = tapply(alignments$refEnd, alignments$refID, max)
 if(is.null(opt$keep_ref)){
   opt$keep_ref = length(chromMax)
-  alignments = alignments[which(alignments$refID %in% names(sort(chromMax, decreasing = T)[1:opt$keep_ref])),]
-} else{
-  alignments = alignments[which(alignments$refID %in% names(sort(chromMax, decreasing = T)[1:opt$keep_ref])),]
 }
+alignments = alignments[which(alignments$refID %in% names(sort(chromMax, decreasing = T)[1:opt$keep_ref])),]
 
 cat(paste0("\nAfter filtering... Number of alignments: ", nrow(alignments),"\n"))
 cat(paste0("After filtering... Number of query sequences: ", length(unique(alignments$queryID)),"\n\n"))
@@ -88,20 +93,16 @@ cat(paste0("After filtering... Number of query sequences: ", length(unique(align
 # sort df on ref
 alignments$refID = factor(alignments$refID, levels = names(sort(chromMax, decreasing = T)[1:opt$keep_ref])) # set order of refID
 alignments = alignments[with(alignments,order(refID,refStart)),]
-
-# get mean percent ID per contig
-scaffoldIDmean = tapply(alignments$percentID, alignments$queryID, mean)
-alignments$percentIDmean = scaffoldIDmean[match(alignments$queryID, names(scaffoldIDmean))]
+chromMax = tapply(alignments$refEnd, alignments$refID, max)
 
 # make new ref alignments for dot plot
 if(length(levels(alignments$refID)) > 1){
-	chromMax = tapply(alignments$refEnd, alignments$refID, max)
-	alignments$refStart2 = alignments$refStart + sapply(as.character(alignments$refID), function(x) ifelse(x == names(sort(chromMax, decreasing = T))[1], 0, cumsum(chromMax)[match(x, names(sort(chromMax, decreasing = T))) - 1]) )
-	alignments$refEnd2 = alignments$refEnd +     sapply(as.character(alignments$refID), function(x) ifelse(x == names(sort(chromMax, decreasing = T))[1], 0, cumsum(chromMax)[match(x, names(sort(chromMax, decreasing = T))) - 1]) )
+  alignments$refStart2 = alignments$refStart + sapply(as.character(alignments$refID), function(x) ifelse(x == names((chromMax))[1], 0, cumsum(chromMax)[match(x, names(chromMax)) - 1]) )
+  alignments$refEnd2 = alignments$refEnd +     sapply(as.character(alignments$refID), function(x) ifelse(x == names((chromMax))[1], 0, cumsum(chromMax)[match(x, names(chromMax)) - 1]) )
 } else {
-	alignments$refStart2 = alignments$refStart
-	alignments$refEnd2 = alignments$refEnd
-
+  alignments$refStart2 = alignments$refStart
+  alignments$refEnd2 = alignments$refEnd
+  
 }
 
 ## queryID sorting step 1/2
@@ -123,8 +124,8 @@ alignments$queryID = factor(alignments$queryID, levels = unique(as.character(ali
 # per query ID, get aggregrate alignment length to each refID 
 queryLenAggPerRef = sapply((levels(alignments$queryID)), function(x) tapply(alignments$lenAlnQuery[which(alignments$queryID == x)], alignments$refID[which(alignments$queryID == x)], sum) )
 if(length(levels(alignments$refID)) > 1){
-	queryID_Ref = apply(queryLenAggPerRef, 2, function(x) rownames(queryLenAggPerRef)[which.max(x)])
-	} else {queryID_Ref = sapply(queryLenAggPerRef, function(x) rownames(queryLenAggPerRef)[which.max(x)])}
+  queryID_Ref = apply(queryLenAggPerRef, 2, function(x) rownames(queryLenAggPerRef)[which.max(x)])
+} else {queryID_Ref = sapply(queryLenAggPerRef, function(x) names(queryLenAggPerRef)[which.max(x)])}
 # set order for queryID
 alignments$queryID = factor(alignments$queryID, levels = (levels(alignments$queryID))[order(match(queryID_Ref, levels(alignments$refID)))])
 
@@ -136,11 +137,30 @@ names(queryMax) = levels(alignments$queryID)
 alignments$queryStart[which(alignments$queryID %in% queryRevComp)] = queryMax[match(as.character(alignments$queryID[which(alignments$queryID %in% queryRevComp)]), names(queryMax))] - alignments$queryStart[which(alignments$queryID %in% queryRevComp)] + 1
 alignments$queryEnd[which(alignments$queryID %in% queryRevComp)] = queryMax[match(as.character(alignments$queryID[which(alignments$queryID %in% queryRevComp)]), names(queryMax))] - alignments$queryEnd[which(alignments$queryID %in% queryRevComp)] + 1
 
-# make new query alignments for dot plot
+## make new query alignments for dot plot
+# subtract queryStart and Ends by the minimum alignment coordinate + 1
+queryMin = tapply(c(alignments$queryEnd, alignments$queryStart), c(alignments$queryID,alignments$queryID), min)
+names(queryMin) = levels(alignments$queryID)
+alignments$queryStart = alignments$queryStart - queryMin[match(as.character(alignments$queryID),names(queryMin))] + 1
+alignments$queryEnd = alignments$queryEnd - queryMin[match(as.character(alignments$queryID),names(queryMin))] + 1
+
 queryMax = tapply(c(alignments$queryEnd, alignments$queryStart), c(alignments$queryID,alignments$queryID), max)
 names(queryMax) = levels(alignments$queryID)
 alignments$queryStart2 = alignments$queryStart + sapply(as.character(alignments$queryID), function(x) ifelse(x == names(queryMax)[1], 0, cumsum(queryMax)[match(x, names(queryMax)) - 1]) )
 alignments$queryEnd2 = alignments$queryEnd +     sapply(as.character(alignments$queryID), function(x) ifelse(x == names(queryMax)[1], 0, cumsum(queryMax)[match(x, names(queryMax)) - 1]) )
+
+# get mean percent ID per contig
+#   calc percent ID based on on-target alignments only
+if(opt$on_target & length(levels(alignments$refID)) > 1){
+  alignments$queryTarget = queryID_Ref[match(as.character(alignments$queryID), names(queryID_Ref))]
+  alignmentsOnTarget = alignments[which(as.character(alignments$refID) == alignments$queryTarget),]
+  scaffoldIDmean = tapply(alignmentsOnTarget$percentID, alignmentsOnTarget$queryID, mean)
+  alignments$percentIDmean = scaffoldIDmean[match(as.character(alignments$queryID), names(scaffoldIDmean))]
+  alignments$percentIDmean[which(as.character(alignments$refID) != alignments$queryTarget)] = NA
+} else{
+  scaffoldIDmean = tapply(alignments$percentID, alignments$queryID, mean)
+  alignments$percentIDmean = scaffoldIDmean[match(as.character(alignments$queryID), names(scaffoldIDmean))]
+}
 
 # plot
 yTickMarks = tapply(alignments$queryEnd2, alignments$queryID, max)
@@ -149,11 +169,11 @@ if (opt$similarity) {
   gp = ggplot(alignments) +
     geom_point(
       mapping = aes(x = refStart2, y = queryStart2, color = percentIDmean),
-      size = 0.05
+      size = 0.009
     ) +
     geom_point(
       mapping = aes(x = refEnd2, y = queryEnd2, color = percentIDmean),
-      size = 0.05
+      size = 0.009
     ) +
     geom_segment(
       aes(
@@ -180,10 +200,10 @@ if (opt$similarity) {
       panel.grid.minor.x = element_blank(),
       axis.text.y = element_text(size = 4, angle = 15)
     ) +
-    scale_y_continuous(breaks = yTickMarks, labels = levels(alignments$queryID)) +
+    scale_y_continuous(breaks = yTickMarks, labels = substr(levels(alignments$queryID), start = 1, stop = 20)) +
     { if(opt$h_lines){ geom_hline(yintercept = yTickMarks,
-               color = "grey60",
-               size = .1) }} +
+                                  color = "grey60",
+                                  size = .1) }} +
     scale_color_distiller(palette = "Spectral") +
     labs(color = "Mean Percent Identity (per query)", 
          title = paste0(   paste0("Post-filtering number of alignments: ", nrow(alignments),"\t\t\t\t"),
@@ -196,9 +216,9 @@ if (opt$similarity) {
 } else {
   gp = ggplot(alignments) +
     geom_point(mapping = aes(x = refStart2, y = queryStart2),
-               size = 0.05) +
+               size = 0.009) +
     geom_point(mapping = aes(x = refEnd2, y = queryEnd2),
-               size = 0.05) +
+               size = 0.009) +
     geom_segment(aes(
       x = refStart2,
       xend = refEnd2,
@@ -221,7 +241,7 @@ if (opt$similarity) {
       panel.grid.minor.x = element_blank(),
       axis.text.y = element_text(size = 4, angle = 15)
     ) +
-    scale_y_continuous(breaks = yTickMarks, labels = levels(alignments$queryID)) +
+    scale_y_continuous(breaks = yTickMarks, labels = substr(levels(alignments$queryID), start = 1, stop = 20)) +
     { if(opt$h_lines){ geom_hline(yintercept = yTickMarks,
                                   color = "grey60",
                                   size = .1) }} +
@@ -235,7 +255,7 @@ if (opt$similarity) {
     ylab("Query")
 }
 # gp
-ggsave(filename = paste0(opt$output_filename, ".png"), width = opt$plot_size, height = opt$plot_size, units = "in")
+ggsave(filename = paste0(opt$output_filename, ".png"), width = opt$plot_size, height = opt$plot_size, units = "in", dpi = 300, limitsize = F)
 
 if(opt$interactive){
   pdf(NULL)
@@ -245,5 +265,3 @@ if(opt$interactive){
 
 options(warn=0) # turn on warnings
 #
-#
-# ////////////////
