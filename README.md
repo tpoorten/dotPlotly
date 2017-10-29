@@ -6,8 +6,11 @@ R script that makes a plotly interactive dot plot. The input is the coords file 
 Example:
 ```
 show-coords -c example.delta > example.coords
-./mummerCoordsDotPlotly.R -i example.coords -o out -s -m 6000 -q 100000 -k 7
+./mummerCoordsDotPlotly.R -i example.coords -o out -s -t -m 500 -q 500000 -k 7 -l
 ```
+
+Updated (10/29/17) :  add -t param, add handling of one ref chrom
+
 
 The script requires three R packages: `install.packages(c("optparse", "ggplot2", "plotly"))`. 
 Use `./mummerCoordsDotPlotly.R -h` to see options.
@@ -39,6 +42,9 @@ Use `./mummerCoordsDotPlotly.R -h` to see options.
 
 	-s, --similarity
 		turn on color alignments by percent similarity [default FALSE]
+
+	-t, --identity-on-target
+		turn on calculation of % identity for on-target alignments only [default FALSE]
 
 	-x, --interactive-plot-off
 		turn off production of interactive plotly [default TRUE]
