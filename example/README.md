@@ -14,7 +14,7 @@ Make dot plot:
 
 
 ```
-../mummerCoordsDotPlotly.R -i Brapa_Bnapus.nucmer.delta.filter.coords -o Brapa_Bnapus.nucmer.plot -s -m 500 -q 500000 -k 10 -x -t -l
+../mummerCoordsDotPlotly.R -i Brapa_Bnapus.nucmer.delta.filter.coords -o Brapa_Bnapus.nucmer.plot -m 1000 -q 300000 -k 10 -s -t -l -p 12
 ```
 
 ![Dotplot](https://github.com/tpoorten/dotPlotly/tree/master/example/Brapa_Bnapus.nucmer.plot.png)
@@ -23,13 +23,13 @@ Make dot plot:
 (16 seconds on a Macbook Pro)
 
 ```
-minimap2 -x asm10 Brassica_rapa.faa Brassica_napus_rape.faa > Brapa_Bnapus.minimap2.paf
+minimap2 -x asm5 Brassica_rapa.faa Brassica_napus_rape.faa > Brapa_Bnapus.minimap2.paf
 ```
 
 Make dot plot:
 
 ```
-../pafCoordsDotPlotly.R -i Brapa_Bnapus.minimap2.paf -o Brapa_Bnapus.minimap2.plot -s -m 500 -q 500000 -k 10 -x -t -l
+../pafCoordsDotPlotly.R -i Brapa_Bnapus.minimap2.paf -o Brapa_Bnapus.minimap2.plot -m 2000 -q 500000 -k 10 -s -t -l -p 12
 ```
 
 ![Dotplot](https://github.com/tpoorten/dotPlotly/tree/master/example/Brapa_Bnapus.minimap2.plot.png)

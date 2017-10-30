@@ -76,7 +76,7 @@ alignments = read.table(opt$input_filename, stringsAsFactors = F, fill = T)
 colnames(alignments)[1:12] = c("queryID","queryLen","queryStart","queryEnd","strand","refID","refLen","refStart","refEnd","numResidueMatches","lenAln","mapQ")
 alignments$percentID = alignments$numResidueMatches / alignments$lenAln
 
-cat(paste0("Number of alignments: ", nrow(alignments),"\n"))
+cat(paste0("\nNumber of alignments: ", nrow(alignments),"\n"))
 cat(paste0("Number of query sequences: ", length(unique(alignments$queryID)),"\n"))
 
 # filter queries by alignment length, for now include overlapping intervals

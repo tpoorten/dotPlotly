@@ -66,7 +66,7 @@ alignments = alignments[,-c(3,6,9,11,14)]
 # set column names
 colnames(alignments) = c("refStart","refEnd","queryStart","queryEnd","lenAlnRef","lenAlnQuery","percentID","percentAlnCovRef","percentAlnCovQuery","refID","queryID")
 
-cat(paste0("Number of alignments: ", nrow(alignments),"\n"))
+cat(paste0("\nNumber of alignments: ", nrow(alignments),"\n"))
 cat(paste0("Number of query sequences: ", length(unique(alignments$queryID)),"\n"))
 
 # filter queries by alignment length, for now include overlapping intervals
