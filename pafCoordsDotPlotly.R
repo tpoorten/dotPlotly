@@ -45,6 +45,16 @@ options(error=traceback)
 parser <- OptionParser(usage = "%prog -i alignments.coords -o out [options]",option_list=option_list)
 opt = parse_args(parser)
 
+# rm(list=ls())
+# setwd("~/GitHubLocal/dotPlotly/testing/minimap_paf/")
+# opt = list(input_filename="susie_ggo_grch38.minimap0.txt",
+#            output_filename="testOut.allRef",
+#            min_align = 500, min_query_aln = 500000,
+#            keep_ref=23, 
+#            similarity=T, h_lines=T, interactive=F, plot_size=15, on_target = T, v=FALSE,
+#            coverage_win=200000)
+
+
 if(opt$v){
   cat(paste0("PARAMETERS:\ninput (-i): ", opt$input_filename,"\n"))
   cat(paste0("output (-o): ", opt$output_filename,"\n"))
@@ -60,24 +70,25 @@ if(opt$v){
 opt$output_filename = unlist(strsplit(opt$output_filename, "/"))[length(unlist(strsplit(opt$output_filename, "/")))]
 
 # read in alignments
-alignments = read.table(opt$input_filename, stringsAsFactors = F, skip = 5)
-alignments = alignments[,-c(3,6,9,11,14)]
+alignments = read.table(opt$input_filename, stringsAsFactors = F)
 
 # set column names
-colnames(alignments) = c("refStart","refEnd","queryStart","queryEnd","lenAlnRef","lenAlnQuery","percentID","percentAlnCovRef","percentAlnCovQuery","refID","queryID")
+# PAF IS ZERO-BASED - CHECK HOW CODE WORKS
+colnames(alignments) = c("queryID","queryLen","queryStart","queryEnd","strand","refID","refLen","refStart","refEnd","numResidueMatches","lenAln","mapQ","cm")
+alignments$percentID = alignments$numResidueMatches / alignments$lenAln
 
 cat(paste0("Number of alignments: ", nrow(alignments),"\n"))
 cat(paste0("Number of query sequences: ", length(unique(alignments$queryID)),"\n"))
 
 # filter queries by alignment length, for now include overlapping intervals
-queryLenAgg = tapply(alignments$lenAlnQuery, alignments$queryID, sum)
+queryLenAgg = tapply(alignments$lenAln, alignments$queryID, sum)
 alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
 
 # filter alignment by length
-alignments = alignments[which(alignments$lenAlnQuery > opt$min_align),]
+alignments = alignments[which(alignments$lenAln > opt$min_align),]
 
 # re-filter queries by alignment length, for now include overlapping intervals
-queryLenAgg = tapply(alignments$lenAlnQuery, alignments$queryID, sum)
+queryLenAgg = tapply(alignments$lenAln, alignments$queryID, sum)
 alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
 
 # # sort by ref chromosome sizes, keep top X chromosomes
@@ -108,7 +119,7 @@ if(length(levels(alignments$refID)) > 1){
 ## queryID sorting step 1/2
 # sort levels of factor 'queryID' based on longest alignment
 alignments$queryID = factor(alignments$queryID, levels=unique(as.character(alignments$queryID))) 
-queryMaxAlnIndex = tapply(alignments$lenAlnQuery,
+queryMaxAlnIndex = tapply(alignments$lenAln,
                           alignments$queryID,
                           which.max,
                           simplify = F)
@@ -122,7 +133,7 @@ alignments$queryID = factor(alignments$queryID, levels = unique(as.character(ali
 ## queryID sorting step 2/2
 ## sort levels of factor 'queryID' based on longest aggregrate alignmentst to refID's
 # per query ID, get aggregrate alignment length to each refID 
-queryLenAggPerRef = sapply((levels(alignments$queryID)), function(x) tapply(alignments$lenAlnQuery[which(alignments$queryID == x)], alignments$refID[which(alignments$queryID == x)], sum) )
+queryLenAggPerRef = sapply((levels(alignments$queryID)), function(x) tapply(alignments$lenAln[which(alignments$queryID == x)], alignments$refID[which(alignments$queryID == x)], sum) )
 if(length(levels(alignments$refID)) > 1){
   queryID_Ref = apply(queryLenAggPerRef, 2, function(x) rownames(queryLenAggPerRef)[which.max(x)])
 } else {queryID_Ref = sapply(queryLenAggPerRef, function(x) names(queryLenAggPerRef)[which.max(x)])}
@@ -186,7 +197,7 @@ if (opt$similarity) {
           'Query: %s<br>Target: %s<br>Length: %s kb',
           queryID,
           refID,
-          round(lenAlnQuery / 1000, 1)
+          round(lenAln / 1000, 1)
         )
       )
     ) +
@@ -228,10 +239,10 @@ if (opt$similarity) {
         'Query: %s<br>Target: %s<br>Length: %s kb',
         queryID,
         refID,
-        round(lenAlnQuery / 1000, 1)
+        round(lenAln / 1000, 1)
       )
     )) +
-    scale_x_continuous(breaks = cumsum(as.numeric(chromMax)),
+    scale_x_continuous(breaks = cumsum(chromMax),
                        labels = levels(alignments$refID)) +
     theme_bw() +
     theme(text = element_text(size = 8)) +
