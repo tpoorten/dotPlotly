@@ -2,6 +2,8 @@
 Compare diploid [Brassica rapa](https://genomevolution.org/coge/GenomeInfo.pl?gid=28890) and allo-tetraploid [Brassica napus](https://genomevolution.org/coge/GenomeInfo.pl?gid=25695)
 (hybrid of B. rapa and B. oleracea)
 
+NB: Some differences between below dot plots (e.g. sparseness of alignments) may be due to filtering parameter settings (`-m` and `-q`).
+
 ### 1. Mummer example
 
 ```
