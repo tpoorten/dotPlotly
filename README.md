@@ -1,11 +1,11 @@
 # dotPlotly
 Create an interactive dot plot from mummer output OR PAF format
 
-R script that makes a plotly interactive dot plot. The input is the coords file from the MUMmer utility program `show-coords -c`.
+R script that makes a plotly interactive and/or static (png/pdf) dot plot.
 
 ### Example (more [here](https://github.com/tpoorten/dotPlotly/tree/master/example))
 
-For mummer (nucmer) output:
+For mummer (nucmer -> show-coords) output:
 
 ```
 show-coords -c example.delta > example.coords
