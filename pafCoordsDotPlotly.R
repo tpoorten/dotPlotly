@@ -51,8 +51,7 @@ opt = parse_args(parser)
 #            output_filename="testOut.allRef",
 #            min_align = 500, min_query_aln = 500000,
 #            keep_ref=23, 
-#            similarity=T, h_lines=T, interactive=F, plot_size=15, on_target = T, v=FALSE,
-#            coverage_win=200000)
+#            similarity=T, h_lines=T, interactive=F, plot_size=15, on_target = T, v=FALSE)
 
 
 if(opt$v){
@@ -70,11 +69,11 @@ if(opt$v){
 opt$output_filename = unlist(strsplit(opt$output_filename, "/"))[length(unlist(strsplit(opt$output_filename, "/")))]
 
 # read in alignments
-alignments = read.table(opt$input_filename, stringsAsFactors = F)
+alignments = read.table(opt$input_filename, stringsAsFactors = F, fill = T)
 
 # set column names
 # PAF IS ZERO-BASED - CHECK HOW CODE WORKS
-colnames(alignments) = c("queryID","queryLen","queryStart","queryEnd","strand","refID","refLen","refStart","refEnd","numResidueMatches","lenAln","mapQ","cm")
+colnames(alignments)[1:12] = c("queryID","queryLen","queryStart","queryEnd","strand","refID","refLen","refStart","refEnd","numResidueMatches","lenAln","mapQ")
 alignments$percentID = alignments$numResidueMatches / alignments$lenAln
 
 cat(paste0("Number of alignments: ", nrow(alignments),"\n"))

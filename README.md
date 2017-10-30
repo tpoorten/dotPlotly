@@ -1,15 +1,23 @@
 # dotPlotly
-Create an interactive dot plot from mummer output
+Create an interactive dot plot from mummer output OR PAF format
 
 R script that makes a plotly interactive dot plot. The input is the coords file from the MUMmer utility program `show-coords -c`.
 
 Example:
+Mummer output
 ```
 show-coords -c example.delta > example.coords
 ./mummerCoordsDotPlotly.R -i example.coords -o out -s -t -m 500 -q 500000 -k 7 -l
 ```
+PAF format 
+```
+./pafCoordsDotPlotly.R -i example.paf -o out -s -t -m 500 -q 500000 -k 7 -l
+```
 
-Updated (10/29/17) :  add -t param, add handling of one ref chrom
+Updates (10/29/17)
+
+  + Added script for [PAF format](https://github.com/lh3/miniasm/blob/master/PAF.md)
+  + Fixes for Mummer format script: add -t param, add handling of one ref chrom 
 
 
 The script requires three R packages: `install.packages(c("optparse", "ggplot2", "plotly"))`. 
