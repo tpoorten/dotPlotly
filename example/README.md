@@ -17,7 +17,7 @@ Make dot plot:
 ../mummerCoordsDotPlotly.R -i Brapa_Bnapus.nucmer.delta.filter.coords -o Brapa_Bnapus.nucmer.plot -m 1000 -q 300000 -k 10 -s -t -l -p 12
 ```
 
-![Dotplot](https://github.com/tpoorten/dotPlotly/tree/master/example/Brapa_Bnapus.nucmer.plot.png)
+![Dotplot](Brapa_Bnapus.nucmer.plot.png)
 
 ### 2. Minimap2 example 
 (16 seconds on a Macbook Pro)
@@ -32,4 +32,4 @@ Make dot plot:
 ../pafCoordsDotPlotly.R -i Brapa_Bnapus.minimap2.paf -o Brapa_Bnapus.minimap2.plot -m 2000 -q 500000 -k 10 -s -t -l -p 12
 ```
 
-![Dotplot](https://github.com/tpoorten/dotPlotly/tree/master/example/Brapa_Bnapus.minimap2.plot.png)
+![Dotplot](Brapa_Bnapus.minimap2.plot.png)
