@@ -69,6 +69,13 @@ colnames(alignments) = c("refStart","refEnd","queryStart","queryEnd","lenAlnRef"
 cat(paste0("\nNumber of alignments: ", nrow(alignments),"\n"))
 cat(paste0("Number of query sequences: ", length(unique(alignments$queryID)),"\n"))
 
+# # sort by ref chromosome sizes, keep top X chromosomes
+chromMax = tapply(alignments$refEnd, alignments$refID, max)
+if(is.null(opt$keep_ref)){
+  opt$keep_ref = length(chromMax)
+}
+alignments = alignments[which(alignments$refID %in% names(sort(chromMax, decreasing = T)[1:opt$keep_ref])),]
+
 # filter queries by alignment length, for now include overlapping intervals
 queryLenAgg = tapply(alignments$lenAlnQuery, alignments$queryID, sum)
 alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
@@ -79,13 +86,6 @@ alignments = alignments[which(alignments$lenAlnQuery > opt$min_align),]
 # re-filter queries by alignment length, for now include overlapping intervals
 queryLenAgg = tapply(alignments$lenAlnQuery, alignments$queryID, sum)
 alignments = alignments[which(alignments$queryID %in% names(queryLenAgg)[which(queryLenAgg > opt$min_query_aln)]),]
-
-# # sort by ref chromosome sizes, keep top X chromosomes
-chromMax = tapply(alignments$refEnd, alignments$refID, max)
-if(is.null(opt$keep_ref)){
-  opt$keep_ref = length(chromMax)
-}
-alignments = alignments[which(alignments$refID %in% names(sort(chromMax, decreasing = T)[1:opt$keep_ref])),]
 
 cat(paste0("\nAfter filtering... Number of alignments: ", nrow(alignments),"\n"))
 cat(paste0("After filtering... Number of query sequences: ", length(unique(alignments$queryID)),"\n\n"))
