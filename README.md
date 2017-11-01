@@ -65,6 +65,9 @@ Use `./mummerCoordsDotPlotly.R -h` to see options.
 	-x, --interactive-plot-off
 		turn off production of interactive plotly [default TRUE]
 
+	-r REFERENCE-IDS, --reference-ids=REFERENCE-IDS
+		comma-separated list of reference IDs to keep [default NULL]
+
 	-h, --help
 		Show this help message and exit
 ```
