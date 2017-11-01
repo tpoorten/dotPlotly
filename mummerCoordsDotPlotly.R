@@ -37,7 +37,10 @@ option_list <- list(
               dest="on_target"),
   make_option(c("-x", "--interactive-plot-off"), action="store_false", default=TRUE,
               help="turn off production of interactive plotly [default %default]",
-              dest="interactive")
+              dest="interactive"),
+  make_option(c("-r", "--reference-ids"), type="character", default=NULL,
+              help="comma-separated list of reference IDs to keep [default %default]",
+              dest="refIDs")
 )
 
 options(error=traceback)
@@ -56,6 +59,7 @@ if(opt$v){
   cat(paste0("show % identity (-s): ", opt$similarity,"\n"))
   cat(paste0("show % identity for on-target alignments only (-t): ", opt$similarity,"\n"))
   cat(paste0("produce interactive plot (-x): ", opt$interactive,"\n"))
+  cat(paste0("reference IDs to keep (-r): ", opt$refIDs,"\n"))
 }
 opt$output_filename = unlist(strsplit(opt$output_filename, "/"))[length(unlist(strsplit(opt$output_filename, "/")))]
 
@@ -69,12 +73,19 @@ colnames(alignments) = c("refStart","refEnd","queryStart","queryEnd","lenAlnRef"
 cat(paste0("\nNumber of alignments: ", nrow(alignments),"\n"))
 cat(paste0("Number of query sequences: ", length(unique(alignments$queryID)),"\n"))
 
-# # sort by ref chromosome sizes, keep top X chromosomes
-chromMax = tapply(alignments$refEnd, alignments$refID, max)
-if(is.null(opt$keep_ref)){
-  opt$keep_ref = length(chromMax)
+# sort by ref chromosome sizes, keep top X chromosomes OR keep specified IDs
+if(is.null(opt$refIDs)){
+  chromMax = tapply(alignments$refEnd, alignments$refID, max)
+  if(is.null(opt$keep_ref)){
+    opt$keep_ref = length(chromMax)
+  }
+  refIDsToKeepOrdered = names(sort(chromMax, decreasing = T)[1:opt$keep_ref])
+  alignments = alignments[which(alignments$refID %in% refIDsToKeepOrdered),]
+  
+} else {
+  refIDsToKeepOrdered = unlist(strsplit(opt$refIDs, ","))
+  alignments = alignments[which(alignments$refID %in% refIDsToKeepOrdered),]
 }
-alignments = alignments[which(alignments$refID %in% names(sort(chromMax, decreasing = T)[1:opt$keep_ref])),]
 
 # filter queries by alignment length, for now include overlapping intervals
 queryLenAgg = tapply(alignments$lenAlnQuery, alignments$queryID, sum)
@@ -91,7 +102,7 @@ cat(paste0("\nAfter filtering... Number of alignments: ", nrow(alignments),"\n")
 cat(paste0("After filtering... Number of query sequences: ", length(unique(alignments$queryID)),"\n\n"))
 
 # sort df on ref
-alignments$refID = factor(alignments$refID, levels = names(sort(chromMax, decreasing = T)[1:opt$keep_ref])) # set order of refID
+alignments$refID = factor(alignments$refID, levels = refIDsToKeepOrdered) # set order of refID
 alignments = alignments[with(alignments,order(refID,refStart)),]
 chromMax = tapply(alignments$refEnd, alignments$refID, max)
 
