@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1515914858833.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "E66BFD71",
+    "lastKnownWriteTime" : 1515913326,
+    "last_content_update" : 1515913326,
+    "path" : "~/GitHubLocal/dotPlotly/dotPlotly_shiny/deploy.R",
+    "project_path" : "deploy.R",
+    "properties" : {
+        "cursorPosition" : "2,0",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
