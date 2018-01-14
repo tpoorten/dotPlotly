@@ -180,9 +180,6 @@ server = function(input, output) {
       #
       chromMax = tapply(mydata$refEnd, mydata$refID, max)
       yTickMarks = tapply(mydata$queryEnd2, mydata$queryID, max)
-      print(yTickMarks)
-      print(length(yTickMarks))
-      print(length(substr(levels(mydata$queryID), start = 1, stop = 20)))
       options(warn = -1) # turn off warnings
       if (opt$similarity) {
         gp = ggplot(mydata) +
