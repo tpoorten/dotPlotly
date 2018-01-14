@@ -3,6 +3,8 @@ Create an interactive dot plot from mummer output OR PAF format
 
 R script that makes a plotly interactive and/or static (png/pdf) dot plot.
 
+[Shiny app available for testing](https://tom-poorten.shinyapps.io/dotplotly_shiny/)
+
 ### Example (more [here](https://github.com/tpoorten/dotPlotly/tree/master/example))
 
 For mummer (nucmer -> show-coords) output:
