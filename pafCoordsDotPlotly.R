@@ -212,11 +212,13 @@ if (opt$similarity) {
         yend = queryEnd2,
         color = percentIDmean,
         text = sprintf(
-          'Query ID: %s<br>Query Pos: %s<br>Target ID: %s<br>Target Pos: %s<br>Length: %s kb',
+          'Query ID: %s<br>Query Start Pos: %s<br>Query End Pos: %s<br>Target ID: %s<br>Target Start Pos: %s<br>Target End Pos: %s<br>Length: %s kb',
           queryID,
           queryStart,
+          queryEnd,
           refID,
           refStart,
+          refEnd,
           round(lenAln / 1000, 1)
         )
       )
@@ -256,11 +258,13 @@ if (opt$similarity) {
       y = queryStart2,
       yend = queryEnd2,
       text = sprintf(
-        'Query ID: %s<br>Query Pos: %s<br>Target ID: %s<br>Target Pos: %s<br>Length: %s kb',
+        'Query ID: %s<br>Query Start Pos: %s<br>Query End Pos: %s<br>Target ID: %s<br>Target Start Pos: %s<br>Target End Pos: %s<br>Length: %s kb',
         queryID,
         queryStart,
+        queryEnd,
         refID,
         refStart,
+        refEnd,
         round(lenAln / 1000, 1)
       )
     )) +
