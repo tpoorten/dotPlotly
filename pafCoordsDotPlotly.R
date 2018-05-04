@@ -212,9 +212,11 @@ if (opt$similarity) {
         yend = queryEnd2,
         color = percentIDmean,
         text = sprintf(
-          'Query: %s<br>Target: %s<br>Length: %s kb',
+          'Query ID: %s<br>Query Pos: %s<br>Target ID: %s<br>Target Pos: %s<br>Length: %s kb',
           queryID,
+          queryStart,
           refID,
+          refStart,
           round(lenAln / 1000, 1)
         )
       )
@@ -240,7 +242,7 @@ if (opt$similarity) {
                            paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"\t\t\t\t\t\t\t\t"),
                            paste0("minimum query aggregate alignment length (-q): ", opt$min_query_aln)
          )) +
-    xlab("Reference") +
+    xlab("Target") +
     ylab("Query")
 } else {
   gp = ggplot(alignments) +
@@ -254,9 +256,11 @@ if (opt$similarity) {
       y = queryStart2,
       yend = queryEnd2,
       text = sprintf(
-        'Query: %s<br>Target: %s<br>Length: %s kb',
+        'Query ID: %s<br>Query Pos: %s<br>Target ID: %s<br>Target Pos: %s<br>Length: %s kb',
         queryID,
+        queryStart,
         refID,
+        refStart,
         round(lenAln / 1000, 1)
       )
     )) +
@@ -280,7 +284,7 @@ if (opt$similarity) {
                            paste0("Post-filtering number of queries: ", length(unique(alignments$queryID)),"\t\t\t\t\t\t\t\t"),
                            paste0("minimum query aggregate alignment length (-q): ", opt$min_query_aln)
          )) +
-    xlab("Reference") +
+    xlab("Target") +
     ylab("Query")
 }
 # gp
