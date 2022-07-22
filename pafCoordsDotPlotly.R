@@ -78,6 +78,14 @@ alignments = read.table(opt$input_filename, stringsAsFactors = F, fill = T)
 # set column names
 # PAF IS ZERO-BASED - CHECK HOW CODE WORKS
 colnames(alignments)[1:12] = c("queryID","queryLen","queryStart","queryEnd","strand","refID","refLen","refStart","refEnd","numResidueMatches","lenAln","mapQ")
+alignments = alignments[,1:12]
+
+# fix type errors, convert columns to numeric
+#sapply(alignments, class) # check class
+cols.num <- c("queryLen","queryStart", 'queryEnd', 'refLen', 'refStart', 'refEnd', 'numResidueMatches', 'lenAln', 'mapQ')
+alignments[cols.num] <- sapply(alignments[cols.num], as.numeric)
+alignments = na.omit(alignments)
+#sapply(alignments, class) # check class
 
 # Fixes for PAF
 # Some measure of similarity - need to check on this
