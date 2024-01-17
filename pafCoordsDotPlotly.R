@@ -40,7 +40,13 @@ option_list <- list(
               dest="interactive"),
   make_option(c("-r", "--reference-ids"), type="character", default=NULL,
               help="comma-separated list of reference IDs to keep [default %default]",
-              dest="refIDs")
+              dest="refIDs"),
+  make_option(c("--pdf-plot-on"), action="store_true", default=FALSE,
+              help="turn on production of .PDF format plotly [default %default]",
+              dest="format_pdf"),
+  make_option(c("--svg-plot-on"), action="store_true", default=FALSE,
+              help="turn on production of .SVG format plotly [default %default]",
+              dest="format_svg")
 )
 
 options(error=traceback)
@@ -68,6 +74,8 @@ if(opt$v){
   cat(paste0("show % identity (-s): ", opt$similarity,"\n"))
   cat(paste0("show % identity for on-target alignments only (-t): ", opt$similarity,"\n"))
   cat(paste0("produce interactive plot (-x): ", opt$interactive,"\n"))
+  cat(paste0("produce .pdf plot (--pdf-plot-on): ", opt$format_pdf,"\n"))
+  cat(paste0("produce .svg plot (--svg-plot-on): ", opt$format_svg,"\n"))
   cat(paste0("reference IDs to keep (-r): ", opt$refIDs,"\n"))
 }
 opt$output_filename = unlist(strsplit(opt$output_filename, "/"))[length(unlist(strsplit(opt$output_filename, "/")))]
@@ -293,6 +301,14 @@ if (opt$similarity) {
 }
 # gp
 ggsave(filename = paste0(opt$output_filename, ".png"), width = opt$plot_size, height = opt$plot_size, units = "in", dpi = 300, limitsize = F)
+
+# add .pdf and .svg plotting for issue 18 (https://github.com/tpoorten/dotPlotly/issues/18)
+if(opt$format_pdf){
+  ggsave(filename = paste0(opt$output_filename, ".pdf"), width = opt$plot_size, height = opt$plot_size, units = "in", dpi = 300, limitsize = F)
+}
+if(opt$format_svg){
+  ggsave(filename = paste0(opt$output_filename, ".svg"), width = opt$plot_size, height = opt$plot_size, units = "in", dpi = 300, limitsize = F)
+}
 
 if(opt$interactive){
   pdf(NULL)
